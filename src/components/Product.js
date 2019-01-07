@@ -1,5 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+//TODO:items Component.
+//This is part of the component class.
+/*eslint-disable eqeqeq*/
 
 export class Product extends Component {
   getStyle = () => {
@@ -7,15 +12,15 @@ export class Product extends Component {
       background: "#f4f4f4",
       padding: "10px",
       borderBottom: "1px #ccc dotted",
-      textDecoration: this.props.completed ? "line-through" : "none"
+      textDecoration: this.props.home.completed ? "line-through" : "none"
     };
   };
-
-  markComplete = e => {
-    console.log(this.props);
-  };
+  //In arrow functions, the of 'this' is consistent.
 
   render() {
+    //Destructuring Object properties from home.
+    const { id, title } = this.props.home;
+
     return (
       <div style={this.getStyle()}>
         <p>
@@ -23,15 +28,38 @@ export class Product extends Component {
             type="checkbox"
             name="isComplete"
             id="isComplete"
-            onChange={this.markComplete}
+            onChange={this.props.markComplete.bind(this, id)} //When box state changes(checked), set this property.
           />
-          {this.props.home.title}
+          {title}
+          <button
+            onClick={this.props.delProduct.bind(this, id)}
+            style={btnStyle}
+          >
+            x
+          </button>
         </p>
       </div>
     );
   }
 }
-//propTypes
+//propTypes, Home is intepreted as an Object in order to retrieve Obj properties.
 Product.propTypes = { home: PropTypes.object.isRequired };
+
+const btnStyle = {
+  background: "red",
+  color: "white",
+  border: "none",
+  padding: "5px 9px",
+  borderRadius: "50%",
+  cursor: "pointer",
+  float: "right"
+};
+
+//Necessary to establish the props for each Component
+Product.propTypes = {
+  home: PropTypes.array.isRequired,
+  markComplete: PropTypes.func.isRequired,
+  delElement: PropTypes.func.isRequired
+};
 
 export default Product;
