@@ -1,12 +1,15 @@
 /*eslint-disable eqeqeq*/
-import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Header from "./components/layout/Header";
-import AddProduct from "./components/AddProduct";
+//import Home from "./components/Home";
+//import AddProduct from "./components/AddProduct";
 //import uuid from "uuid";
-import About from "./components/pages/About";
+//import Header from "./components/layout/Header";
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from "axios";
+
+import HomePage from "./components/pages/HomePage";
+import About from "./components/pages/About";
+import ProductList from "./components/pages/ProductList";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -15,26 +18,32 @@ import "bootstrap/dist/css/bootstrap.min.css";
 //! NoteToSelf: App Level State is handled by Context or Redux
 class App extends Component {
   state = {
-    home: [],
+    products: [],
     isLoading: true
   };
 
+  async getProducts() {
+    const res = await axios("/api/products");
+    return await res.data;
+  }
+
   //Runs when component mounts
-  componentDidMount() {
-    axios
-      .get("https://jsonplaceholder.typicode.com/todos?_limit=10")
-      .then(res => this.setState({ home: res.data }));
+  async componentDidMount() {
+    const body = await this.getProducts();
+    this.setState({ products: body, isLoading: false });
+    //Outputting async request
+    console.log(this.state.products);
+    console.log(`Products: ${JSON.stringify(this.state.products)}`);
   }
   //passing the id of the home object being checked.
   markComplete = id => {
-    console.log(`From App.js ${id}`);
     //calling predefined setState
     this.setState({
-      home: this.state.home.map(home => {
-        if (home.id == id) {
-          home.completed = !home.completed;
+      products: this.state.products.map(product => {
+        if (product.id == id) {
+          product.completed = !this.state.products.completed;
         }
-        return home;
+        return product;
       })
     });
   };
@@ -42,9 +51,9 @@ class App extends Component {
   //Delete Todo
   //Spread operator used to copy values, then filter to show only
   delProduct = id => {
-    axios.delete("https://jsonplaceholder.typicode.com/todos/{id}").then(
+    axios.delete("/api/product/{id}").then(
       this.setState({
-        home: [...this.state.home.filter(home => home.id !== id)]
+        products: [...this.state.products.filter(product => product.id !== id)]
       })
     );
   };
@@ -52,37 +61,27 @@ class App extends Component {
   //Add Home
   addProduct = title => {
     axios
-      .post("https://jsonplaceholder.typicode.com/todos?_limit=10", {
+      .post("api/product", {
         title,
         completed: false
       })
-      .then(res => this.setState({ home: [...this.state.home, res.data] }));
+      .then(res =>
+        this.setState({ products: [...this.state.products, res.data] })
+      );
   };
 
   render() {
-    console.log(this.state.home);
+    console.log("this:" + this.state.products);
     return (
       <Router>
-        <div className="App">
-          <div className="customContainer">
-            <Header />
-            <Route
-              exact
-              path="/"
-              render={props => (
-                <React.Fragment>
-                  <AddProduct addProduct={this.addProduct} />
-                  <Home
-                    home={this.state.home}
-                    markComplete={this.markComplete}
-                    delProduct={this.delProduct}
-                  />
-                </React.Fragment>
-              )}
-            />
-            <Route path="/about" component={About} />
-          </div>
-        </div>
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route
+            path="/all"
+            render={() => <ProductList products={this.state.products} />}
+          />
+          <Route path="/about" component={About} />
+        </Switch>
       </Router>
     );
   }
