@@ -3,6 +3,7 @@
 //import AddProduct from "./components/AddProduct";
 //import uuid from "uuid";
 //import Header from "./components/layout/Header";
+
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from "axios";
@@ -10,6 +11,7 @@ import axios from "axios";
 import HomePage from "./components/pages/HomePage";
 import About from "./components/pages/About";
 import ProductList from "./components/pages/ProductList";
+import ItemPage from "./components/pages/ItemPage";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -76,11 +78,12 @@ class App extends Component {
       <Router>
         <Switch>
           <Route exact path="/" component={HomePage} />
+          <Route exact path="/about" component={About} />
+          <Route path="/products/:productID" component={ItemPage} />
           <Route
             path="/all"
             render={() => <ProductList products={this.state.products} />}
           />
-          <Route path="/about" component={About} />
         </Switch>
       </Router>
     );

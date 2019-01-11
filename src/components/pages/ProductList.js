@@ -3,6 +3,9 @@ import Item from "./Item";
 import PropTypes from "prop-types";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AppNavBar from "../layout/AppNavBar";
+import Footer from "../layout/Footer";
+import { Container } from "reactstrap";
+import { CardDeck } from "reactstrap";
 
 /**
  * ProductList Component:
@@ -16,9 +19,14 @@ class ProductList extends Component {
     return (
       <div>
         <AppNavBar />
-        {this.props.products.map(item => (
-          <Item key={item.productID} products={item} />
-        ))}
+        <Container>
+          <CardDeck>
+            {this.props.products.map(item => (
+              <Item key={item.productID} products={item} />
+            ))}
+          </CardDeck>
+        </Container>
+        <Footer />
       </div>
     );
   }
